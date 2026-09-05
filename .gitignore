@@ -1,0 +1,48 @@
+# Dependencies and local package-manager cache
+node_modules/
+.pnpm-store/
+
+# Build output and tool caches
+dist/
+build/
+coverage/
+.cache/
+.vite/
+.vite-temp/
+vite.config.*.timestamp-*
+*.tsbuildinfo
+
+# Local environment files (keep shareable templates)
+.env*
+!.env.example
+!.env.sample
+!.env.template
+
+# Logs and temporary files
+*-debug.log*
+logs/
+*.log
+.claude-replay.*
+.tmp-*
+
+# Local editor settings (keep shared VS Code configuration)
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.swp
+*.swo
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Platform-managed agentplat state, not project source. In the
+# client-initiated single-repo workspace layout (make's `Path: "."` spec) the
+# repo root IS the workspace root, so these land inside this repo rather than
+# beside it.
+/.plugins/
+/.opencode-skills/
