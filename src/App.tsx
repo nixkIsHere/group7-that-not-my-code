@@ -201,6 +201,13 @@ export default function App() {
     setAliasInput("")
   }
 
+  const handleLeaveLobby = () => {
+    socket.disconnect() // สั่ง disconnect เพื่อลบชื่อเราออกจากห้องบนเซิร์ฟเวอร์
+    socket.connect()    // ต่อกลับเข้ามาใหม่เพื่อพร้อมเล่นรอบถัดไป
+    setScreen("home")
+    setAliasInput("")
+  }
+
   const allPlayers = [...lobbyPlayers].sort((a, b) => b.score - a.score)
   const timerPct = (timeLeft / timeLimit) * 100
   const timerColor =
@@ -221,6 +228,7 @@ export default function App() {
           players={lobbyPlayers}
           myId={myId}
           onReady={handleLobbyReady}
+          onBack={handleLeaveLobby}
         />
       )}
       {screen === "game" && currentScenario && (

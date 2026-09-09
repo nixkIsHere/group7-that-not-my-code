@@ -6,6 +6,7 @@ import {
   XMarkIcon,
   SignalIcon,
   PlayIcon,
+  ArrowLeftIcon,
 } from "@heroicons/react/24/outline"
 import { useLang, LangToggle } from "../lib/i18n"
 import { TerminalHeader } from "../components/TerminalHeader"
@@ -15,10 +16,12 @@ export function LobbyScreen({
   players,
   myId,
   onReady,
+  onBack,
 }: {
   players: Player[]
   myId: string
   onReady: () => void
+  onBack: () => void
 }) {
   const { lang, t } = useLang()
   const isTh = lang === "th"
@@ -69,6 +72,36 @@ export function LobbyScreen({
           zIndex: 1,
         }}
       >
+        {/* ปุ่มย้อนกลับไปหน้าหลัก */}
+        <button
+          onClick={onBack}
+          style={{
+            background: "transparent",
+            border: "1px solid var(--border)",
+            color: "var(--muted-foreground)",
+            fontFamily: monoF,
+            fontSize: 12,
+            padding: "6px 12px",
+            marginBottom: "var(--space-3)",
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "var(--cyan)"
+            e.currentTarget.style.borderColor = "var(--cyan)"
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "var(--muted-foreground)"
+            e.currentTarget.style.borderColor = "var(--border)"
+          }}
+        >
+          <ArrowLeftIcon style={{ width: 14, height: 14 }} />
+          {isTh ? "ย้อนกลับ" : "BACK"}
+        </button>
+
         <TerminalHeader label={t.lobbyTitle} lang={lang} />
 
         <div style={{ margin: "var(--space-5) 0" }}>
