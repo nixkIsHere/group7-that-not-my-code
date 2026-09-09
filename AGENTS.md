@@ -14,12 +14,18 @@ A Vite development server is **already running** on `$PORT` (default 8443). You 
 This is the canonical project structure. Start with task-relevant files below. Only follow imports or inspect other files when required, when a documented path is missing, or when the repository contradicts this guide.
 
 - `src/main.tsx` - React entrypoint; imports `src/index.css` and mounts `src/App.tsx` into the `#root` element
-- `src/App.tsx` - Primary application component and the usual starting point for UI work
+- `src/App.tsx` - Root component: screen state machine (`home`/`lobby`/`game`/`review`) and Socket.IO event wiring
+- `src/types.ts` - Shared frontend types (`Scenario`, `Player`, socket payload shapes)
+- `src/lib/i18n.tsx` - EN/TH translations, `LangContext`/`useLang`, `<LangToggle/>`
+- `src/lib/socket.ts` - The `socket.io-client` instance used to talk to `server/`
+- `src/screens/` - One file per screen (`HomeScreen`, `LobbyScreen`, `GameScreen`, `ReviewScreen`)
+- `src/components/` - Shared UI atoms (`VerdictButton`, `StunOverlay`, `ScenarioUIRenderer`, ...)
 - `src/index.css` - Global CSS entrypoint and Tailwind CSS v4 import
 - `index.html` - Vite HTML shell containing the `#root` element and loading `src/main.tsx`
 - `package.json` - Project dependencies and the Vite build, development, preview, and formatting scripts
 - `vite.config.ts` - Vite configuration with React, Tailwind CSS v4, and Figma Make plugins plus the `@` alias for `src`
 - `.mise.toml` - Toolchain versions for Node.js and pnpm
+- `server/` - Node.js + Socket.io + TiDB backend, run as a separate process — see `server/README.md`
 
 ## Dependencies
 
@@ -33,6 +39,16 @@ This is the canonical project structure. Start with task-relevant files below. O
 This project uses **Tailwind CSS v4** through the `@tailwindcss/vite` plugin configured in `vite.config.ts`. `src/index.css` imports Tailwind with `@import 'tailwindcss';`. Use Tailwind utility classes directly in JSX and put global CSS or Tailwind v4 theme customization in `src/index.css`. This scaffold does not need a Tailwind config file or PostCSS config.
 
 `src/main.tsx` imports `src/index.css`, so global font wiring belongs in `src/index.css`. Keep CSS `@import` statements first, then add any `@font-face` rules and font-family defaults there.
+
+## Backend (server/)
+
+The frontend talks to a separate Node.js + Socket.io backend for real multiplayer
+(live lobby, server-authoritative scoring/timing, TiDB-backed leaderboard and
+scenario bank). It's a standalone npm project under `server/` with its own
+`package.json` — it does not run inside Figma Make's dev server and must be
+started separately (`cd server && npm run dev`). See `server/README.md` for
+setup (TiDB Cloud credentials, schema, seeding). The client connects to it via
+`VITE_SERVER_URL` (see root `.env.example`), not through `vite.config.ts`.
 
 ## Code quality
 
