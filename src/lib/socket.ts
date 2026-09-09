@@ -7,7 +7,7 @@ import type {
   RoundStartPayload,
 } from "../types"
 
-const URL = import.meta.env.VITE_SERVER_URL ?? "http://localhost:4000"
+const URL = import.meta.env.VITE_SERVER_URL || undefined
 
 export interface ServerToClientEvents {
   "lobby:update": (payload: LobbyUpdatePayload) => void
@@ -27,9 +27,6 @@ export interface ClientToServerEvents {
   }) => void
 }
 
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
-  URL,
-  {
-    autoConnect: true,
-  },
-)
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = URL
+  ? io(URL, { autoConnect: true })
+  : io({ autoConnect: true })
