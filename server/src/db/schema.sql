@@ -27,3 +27,19 @@ CREATE TABLE IF NOT EXISTS leaderboard_entries (
   played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_leaderboard_score (score DESC)
 );
+
+-- Raw per-question response log — one row per answer, keyed only by the
+-- alias the player typed in (no login, no round/session grouping; think
+-- Google Forms responses). Not summarized anywhere yet; query this
+-- directly later for per-scenario stats.
+CREATE TABLE IF NOT EXISTS answer_log (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  alias VARCHAR(20) NOT NULL,
+  scenario_id INT NOT NULL,
+  given ENUM('comply', 'violate') NOT NULL,
+  correct BOOLEAN NOT NULL,
+  time_ms INT NOT NULL,
+  answered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_answer_log_scenario (scenario_id),
+  INDEX idx_answer_log_alias (alias)
+);

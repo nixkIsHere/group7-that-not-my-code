@@ -1,6 +1,7 @@
 import type { Server } from "socket.io"
 import { pickRandomTen } from "../db/repositories/scenariosRepo"
 import { insertResult } from "../db/repositories/leaderboardRepo"
+import { logAnswer } from "../db/repositories/answerLogRepo"
 import * as lobby from "./lobby"
 import {
   computeScore,
@@ -109,11 +110,23 @@ export function handleAnswer(
   state.score += scoreDelta
   state.correctCount += correct ? 1 : 0
   if (!correct) state.stunCount += 1
+  const given = verdict ?? "comply"
   state.answers.push({
     scenarioId: scenario.id,
-    given: verdict ?? "comply",
+    given,
     correct,
     timeMs: elapsedMs,
+  })
+
+  const player = lobby.getPlayer(socketId)
+  logAnswer({
+    alias: player?.alias ?? "player",
+    scenarioId: scenario.id,
+    given,
+    correct,
+    timeMs: elapsedMs,
+  }).catch((err) => {
+    console.error("[round] failed to log answer:", err)
   })
 
   lobby.updateScore(socketId, state.score, state.answers.length)
