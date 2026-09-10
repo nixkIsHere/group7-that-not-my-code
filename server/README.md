@@ -63,7 +63,38 @@ leaderboard updates to every connected player over Socket.IO.
 
 ## Socket events
 
-See the "Socket event contract" table in the project plan / `src/socket/handlers.ts`
-for the full list. In short: `lobby:join` → `lobby:ready` → a private stream
-of `round:scenario` / `round:result` per player → `round:end`. `lobby:update`
-is broadcast to everyone whenever the roster or any score changes.
+`lobby:join` joins the single shared room while it is waiting. The first
+player is the host; if they leave, the earliest remaining arrival becomes host.
+`lobby:ready` accepts `{ ready: true }` or `{ ready: false }`. Repeated requests
+set the same value rather than toggling it. Legacy requests without a payload
+mean ready. Readiness is stored on the server and never starts a round itself.
+
+`lobby:update` broadcasts `{ players, hostId, status, readyCount, allReady }`.
+The agreed rule is that every member, including the host, must be ready before
+the host can start. There is no fixed player count or automatic start. The room
+model supports `waiting`, `starting`, `playing`, and `finished`; joining and
+changing readiness are allowed only while waiting. An empty room resets itself.
+
+`lobby:join` acknowledges `{ ok, message? }`, so a rejected join stays on the
+home screen. `lobby:start` is host-only and checks all members' readiness on
+the server. It locks the room before loading one shared question sequence,
+then broadcasts `lobby:countdown` with a `startsAt` timestamp. After three
+seconds, every member receives `round:start` and the same first question.
+Players then advance at their own pace through that shared sequence.
+
+`lobby:leave` and disconnect remove membership and cancel that player's timers.
+A departure while loading/counting down cancels the start and resets readiness.
+Question-loading failures also reopen the room for a retry. Once all remaining
+players finish or leave, the room reopens with scores and readiness reset.
+The review screen keeps its completed-round results. Returning home leaves
+the room; a disconnected player must explicitly rejoin.
+
+Run the room behavior tests with Node 22.18+ from `server/`:
+
+```bash
+node --import tsx --test tests/lobby.test.mts tests/multiplayer.test.mts
+```
+
+The multiplayer tests use real local Socket.IO clients, shortened countdowns,
+and injected database functions; they do not write to TiDB. Install root and
+server dependencies first (the tests use the frontend's Socket.IO client).

@@ -41,7 +41,7 @@ export async function getAllScenarios(): Promise<Scenario[]> {
   return rows.map(rowToScenario)
 }
 
-/** Picks up to 10 scenarios in a random order for one player's round. */
+/** Picks up to 10 scenarios once for the whole room. */
 export async function pickRandomTen(): Promise<Scenario[]> {
   const all = await getAllScenarios()
   if (all.length === 0) {
